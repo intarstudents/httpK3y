@@ -3,9 +3,10 @@ var httpk3y = {
   init: function(){
     this.consoleObject = Components.classes["@mozilla.org/consoleservice;1"].getService(Components.interfaces.nsIConsoleService);
     this.debug = true;
+    this.keyset = {};
     
-    this.serverBoot();
     this.mainKeysetCache();
+    this.serverBoot();
     
     this.log("ready!");
   },
@@ -19,6 +20,12 @@ var httpk3y = {
                   createInstance(Components.interfaces.nsIHttpServer);
     var port = 8801;
     
+    for(var keyset_id in this.keyset){
+      this.server.registerPathHandler("/" + keyset_id, this.serverKeyHandler);
+      //this.log(keyset_id);
+    }
+    
+    this.server.registerPathHandler("/", this.serverIndex);
     this.server.registerErrorHandler(404, this.serverErrorParser);
     this.server.start(port);
     
@@ -35,11 +42,33 @@ var httpk3y = {
   },
   
   serverErrorParser: function(request, response){
+    response.setStatusLine("1.1", 500, "Error");
+    response.write("Error!!");
+  },
+  
+  serverKeyHandler: function(request, response){
+    var method = /\/(.*?)$/i.exec(request.path);
+    httpk3y.log("request " + request.path);
+    httpk3y.log(method);
+    if (method && httpk3y.keyset[method[1]]){
+      httpk3y.keyset[method[1]].doCommand();
+    }
+  },
+  
+  serverIndex: function(request, response){
+    var arr = [];
+    for(var keyset_id in httpk3y.keyset){
+      arr.push(keyset_id);
+    }
+  
     response.setStatusLine("1.1", 200, "OK");
-    response.write("hello!");
+    response.write(arr.join("\n"));
   },
   
   mainKeysetCache: function(){
+    // Reset keyset
+    this.keyset = {};
+    
     var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator);
     var enumerator = wm.getEnumerator("navigator:browser");
     
@@ -49,9 +78,10 @@ var httpk3y = {
       var mainKeyset = win.document.getElementById("httpk3y_key_fake").parentNode;
       
       for(var node=0; node < mainKeyset.childNodes.length; node++){
-        this.log(mainKeyset.childNodes[node].getAttribute("id"));
+        var keyset_id = mainKeyset.childNodes[node].getAttribute("id");
+        this.keyset[keyset_id] = mainKeyset.childNodes[node];
       }
-      //this.log(mainKeyset);
+      
     }
   },
   
