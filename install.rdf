@@ -9,9 +9,10 @@
   <RDF:Description RDF:about="urn:mozilla:install-manifest"
                    em:id="httpK3y@intars.students"
                    em:name="httpK3y"
-                   em:description="Add missing global keyboard combo functionality to Firefox!"
+                   em:description="Access keyboard shortcuts from outside!"
                    em:version="0.1"
-                   em:creator="Intars Students">
+                   em:creator="Intars Students"
+                   em:optionsURL="chrome://httpk3y/content/options.xul">
     <em:targetApplication RDF:resource="rdf:#$kLx0i3"/>
   </RDF:Description>
 </RDF:RDF>
