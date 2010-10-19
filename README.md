@@ -39,7 +39,7 @@ To list all available methods (keyboard shortcuts ids) go to `http://localhost:P
 * key_closeWindow
 ....
 
-These all are methods that are available for you to use throw httpK3y server. Just navigate your way to `http://localhost:PORT/method_name`. Example: if you want to open `Downloads` window remotly, navigate to `http://localhost:PORT/key_openDownloads` (without quotes). Downloads windows should appear in front of your eyes :)
+These all are methods that are available for you to use throw httpK3y server. Just navigate your way to `http://localhost:PORT/method_name`. Example: if you want to open `Downloads` window remotely, navigate to `http://localhost:PORT/key_openDownloads`. Downloads windows should appear in front of your eyes.
 
 And of course you don't have to be inside Firefox to open that window:
 
