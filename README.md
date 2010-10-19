@@ -20,7 +20,7 @@ Replace `PORT` with port number that you have chosen for httpK3y or with default
 
 ### Giving it a try
 
-To list all available methods (keyboard shortcuts ids) go to "http://localhost:PORT/" (without quotes). In response you should be greeted with something like this:
+To list all available methods (keyboard shortcuts ids) go to `http://localhost:PORT/` (without quotes). In response you should be greeted with something like this:
 
 #### List of available methods
 
@@ -39,7 +39,14 @@ To list all available methods (keyboard shortcuts ids) go to "http://localhost:P
 * key_closeWindow
 ....
 
-From these you can now figure out what you want remotly to do. If it was to open `Downloads` window go to "http://localhost:PORT/key_openDownloads" (without quotes). Downloads windows should apper in front of your eyes.
+These all are methods that are available for you to use throw httpK3y server. Just navigate your way to `http://localhost:PORT/method_name`. Example: if you want to open `Downloads` window remotly, navigate to `http://localhost:PORT/key_openDownloads` (without quotes). Downloads windows should appear in front of your eyes :)
+
+And of course you don't have to be inside Firefox to open that window:
+
+    $ wget http://localhost:PORT/key_openDownloads --spider --no-cache
+    
+I hope you get the point ;)
+Have fun!
 
 Building bundle for Firefox
 ---------------------------
