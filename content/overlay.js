@@ -3,10 +3,14 @@ var httpk3y = {
   init: function(){
     this.consoleObject = Components.classes["@mozilla.org/consoleservice;1"].getService(Components.interfaces.nsIConsoleService);
     this.debug = true;
+    this.default_port = 7700;
+    this.environment = typeof(WebRunner) != "undefined" ? "prism" : "firefox";
     this.keyset = {};
     
     this.mainKeysetCache();
-    this.serverBoot();
+    
+    if (this.serverGetStartup())
+      this.serverBoot();
     
     this.log("ready!");
   },
@@ -16,20 +20,30 @@ var httpk3y = {
   },
   
   serverBoot: function(){
-    this.server = Components.classes["@mozilla.org/server/jshttp;1"].
-                  createInstance(Components.interfaces.nsIHttpServer);
-    var port = 8801;
+    try{
     
-    for(var keyset_id in this.keyset){
-      this.server.registerPathHandler("/" + keyset_id, this.serverKeyHandler);
-      //this.log(keyset_id);
+      this.server = Components.classes["@mozilla.org/server/jshttp;1"].
+                    createInstance(Components.interfaces.nsIHttpServer);
+      var port = this.serverGetPort();
+      
+      for(var keyset_id in this.keyset){
+        this.server.registerPathHandler("/" + keyset_id, this.serverKeyHandler);
+        //this.log(keyset_id);
+      }
+      
+      this.server.registerPathHandler("/", this.serverIndex);
+      this.server.registerErrorHandler(404, this.serverErrorParser);
+      this.server.start(port);
+      
+      this.log("server booted (@ http://localhost:" + port + ")");
+      return true;
+      
+    }catch(e){
+    
+      this.log("server boot failed (@ " + e + ")");
+      return false;
+      
     }
-    
-    this.server.registerPathHandler("/", this.serverIndex);
-    this.server.registerErrorHandler(404, this.serverErrorParser);
-    this.server.start(port);
-    
-    this.log("server booted (@ http://localhost:" + port + ")");
   },
   
   serverHalt: function(){
@@ -101,6 +115,97 @@ var httpk3y = {
           this.keyset[keyset_id] = mainKeyset.childNodes[node];
       }
 
+    }
+  },
+  
+  optionsUI: function(){
+    this.optionsDoc.getElementById("httpk3y-serverToggle").setAttribute("label", (this.server == undefined ? "Start" : "Stop"));
+    this.optionsDoc.getElementById("httpk3y-serverStartupToggle").setAttribute("label", "Start with " + (this.environment == "prism" ? "Prism" : "Firefox"))
+    this.optionsDoc.getElementById("httpk3y-serverStartupToggle").setAttribute("checked", this.serverGetStartup());
+    
+    
+    var serverPortCheckbox = this.optionsDoc.getElementById("httpk3y-serverPortToggle");
+    serverPortCheckbox.value = this.serverGetPort();
+    
+    if (this.server != undefined)
+      serverPortCheckbox.setAttribute("disabled", true);
+    
+    this.log("options UI updated");
+  },
+  
+  serverGetStartup: function(){
+    var pref = Components.classes["@mozilla.org/preferences-service;1"]
+               .getService(Components.interfaces.nsIPrefBranch);
+    return pref.getBoolPref("extensions.httpk3y.server_autostart");
+  },
+  
+  serverSetStartup: function(s){
+    var pref = Components.classes["@mozilla.org/preferences-service;1"]
+               .getService(Components.interfaces.nsIPrefBranch);
+    pref.setBoolPref("extensions.httpk3y.server_autostart", (s ? true : false));
+  },
+  
+  serverStartupToggle: function(){
+    var serverStartupCheckbox = this.optionsDoc.getElementById("httpk3y-serverStartupToggle");
+    this.serverSetStartup(serverStartupCheckbox.getAttribute("checked"));
+  },
+  
+  serverGetPort: function(){
+    var pref = Components.classes["@mozilla.org/preferences-service;1"]
+               .getService(Components.interfaces.nsIPrefBranch);
+    var port = pref.getIntPref("extensions.httpk3y.server_port");
+    
+    if (port >= 1024 && port <= 65535){
+      return port;
+    }else{
+      return this.default_port;
+    }
+  },
+  
+  serverSetPort: function(s){
+    var pref = Components.classes["@mozilla.org/preferences-service;1"]
+               .getService(Components.interfaces.nsIPrefBranch);
+    var port = parseInt(s);
+    
+    pref.setIntPref("extensions.httpk3y.server_port", (port >= 1024 && port <= 65535 ? port : this.default_port));
+  },
+  
+  serverPortToggle: function(){
+    this.serverSetPort(this.optionsDoc.getElementById("httpk3y-serverPortToggle").value);
+  },
+  
+  serverToggle: function(){
+    var toggleButton = this.optionsDoc.getElementById("httpk3y-serverToggle");
+    var toggleServerPort = this.optionsDoc.getElementById("httpk3y-serverPortToggle");
+    
+    toggleButton.setAttribute("disabled", true);
+    
+    if (toggleButton.getAttribute("label") == "Start"){
+      if (this.serverBoot()){
+        toggleButton.setAttribute("label", "Stop");
+        
+        toggleButton.setAttribute("disabled", false);
+        toggleServerPort.setAttribute("disabled", true);
+      }else{
+        toggleButton.setAttribute("label", "Couldn't start server!");
+        
+        setTimeout(function(){
+          var toggleButton = keysharky.optionsDoc.getElementById("httpk3y-serverToggle");
+          toggleButton.setAttribute("label", "Start");
+          
+          toggleButton.setAttribute("disabled", false);
+          toggleServerPort.removeAttribute("disabled");
+        }, 3000);
+      }
+      
+    }else{
+      if (!this.serverHalt())
+        this.server = undefined;
+        
+      toggleButton.setAttribute("label", "Start");
+      
+      toggleButton.setAttribute("disabled", false);
+      toggleServerPort.removeAttribute("disabled");
     }
   },
   
