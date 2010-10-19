@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://keysharky/skin/options.css" type="text/css"?>
+<window id="keysharky-options" title="httpK3y Options"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  
+  <script type="text/javascript">
+    // Creating link between keysharky object in main window and option window
+    
+    var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+                   .getService(Components.interfaces.nsIWindowMediator);
+    var mainWindow = wm.getMostRecentWindow("navigator:browser");
+    
+    // Neat, right?
+    var httpk3y = mainWindow.httpk3y;
+    httpk3y.optionsDoc = document;
+  </script>
+  
+  <!-- Sadly there isn't oncommand for checkbox object, so ... -->
+  <command id="httpk3y_cmd_serverStartupToggle"  oncommand="httpk3y.serverStartupToggle();" />
+  
+  <vbox width="400">
+    
+    <groupbox id="httpk3y-group-server">
+      <caption label="Server"/>
+      
+      <hbox align="center">
+        <label control="httpk3y-serverPortToggle" value="Port"/>
+        <textbox 
+          id="httpk3y-serverPortToggle" 
+          onchange = "httpk3y.serverPortToggle();"
+          max="65535" 
+          min="1024" 
+          maxLength="5" 
+          size="5" 
+          type="number" />
+          
+        <spacer flex="1"/>
+        
+        <checkbox 
+          id="httpk3y-serverStartupToggle" 
+          command="httpk3y_cmd_serverStartupToggle" 
+          checked="false"/>
+      </hbox>
+      
+      <hbox align="center">
+        <spacer flex="1"/>
+        <button id="httpk3y-serverToggle" oncommand="httpk3y.serverToggle();" label="Start" />
+        <spacer flex="1"/>
+      </hbox>
+    </groupbox>
+  </vbox>
+  
+  <script type="text/javascript">
+    window.addEventListener("load", function(e) { httpk3y.optionsUI(e); }, false);
+    window.addEventListener("unload", function(e) { httpk3y.serverPortToggle(); }, false);
+  </script>
+</window>
+
