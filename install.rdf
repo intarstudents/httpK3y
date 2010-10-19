@@ -9,7 +9,7 @@
   <RDF:Description RDF:about="urn:mozilla:install-manifest"
                    em:id="httpK3y@intars.students"
                    em:name="httpK3y"
-                   em:description="Access keyboard shortcuts from outside!"
+                   em:description="Toggle keyboard shortcuts from outside of Firefox!"
                    em:version="0.1"
                    em:creator="Intars Students"
                    em:optionsURL="chrome://httpk3y/content/options.xul"
