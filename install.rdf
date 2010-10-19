@@ -12,7 +12,8 @@
                    em:description="Access keyboard shortcuts from outside!"
                    em:version="0.1"
                    em:creator="Intars Students"
-                   em:optionsURL="chrome://httpk3y/content/options.xul">
+                   em:optionsURL="chrome://httpk3y/content/options.xul"
+                   em:iconURL="chrome://httpk3y/skin/httpk3y.png">
     <em:targetApplication RDF:resource="rdf:#$kLx0i3"/>
   </RDF:Description>
 </RDF:RDF>
