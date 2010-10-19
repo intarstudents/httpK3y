@@ -3,7 +3,14 @@
   
   <script src="chrome://httpk3y/content/overlay.js"/>
   
+  
+  <!-- Firefox -->
   <keyset id="mainKeyset">
+    <key id="httpk3y_key_fake" />
+  </keyset>
+  
+  <!-- Prism -->
+  <keyset id="keyset_main">
     <key id="httpk3y_key_fake" />
   </keyset>
 
