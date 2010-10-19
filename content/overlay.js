@@ -47,22 +47,40 @@ var httpk3y = {
   },
   
   serverKeyHandler: function(request, response){
+    response.setHeader("Cache-Control", "no-cache", false);
     var method = /\/(.*?)$/i.exec(request.path);
-    httpk3y.log("request " + request.path);
-    httpk3y.log(method);
+    
     if (method && httpk3y.keyset[method[1]]){
-      httpk3y.keyset[method[1]].doCommand();
+      try{
+        httpk3y.keyset[method[1]].doCommand();
+      }catch(e){
+        try {
+          httpk3y.mainKeysetCache();
+          httpk3y.keyset[method[1]].doCommand();
+        }catch(e){
+          httpk3y.log(e);
+          
+          response.setStatusLine("1.1", 500, "Error");
+          response.write("Failed to toggle keyboard shortcut '" + method[1] + "'\nException: " + e);
+          
+          return;
+        }
+      }
     }
+    
+    response.setStatusLine("1.1", 200, "OK");
+    response.write("Toggled '" + method[1] + "'");
   },
   
   serverIndex: function(request, response){
     var arr = [];
     for(var keyset_id in httpk3y.keyset){
-      arr.push(keyset_id);
+      arr.push("<li>" + keyset_id + "</li>");
     }
   
     response.setStatusLine("1.1", 200, "OK");
-    response.write(arr.join("\n"));
+    response.write("<h2>List of available methods</h2>");
+    response.write("<ul>" + arr.join("\n") + "</ul>");
   },
   
   mainKeysetCache: function(){
@@ -72,16 +90,17 @@ var httpk3y = {
     var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator);
     var enumerator = wm.getEnumerator("navigator:browser");
     
-    while(enumerator.hasMoreElements()) {
+    if (enumerator.hasMoreElements()){
+    
       var win = enumerator.getNext();
-      
       var mainKeyset = win.document.getElementById("httpk3y_key_fake").parentNode;
-      
+
       for(var node=0; node < mainKeyset.childNodes.length; node++){
         var keyset_id = mainKeyset.childNodes[node].getAttribute("id");
-        this.keyset[keyset_id] = mainKeyset.childNodes[node];
+        if (keyset_id)
+          this.keyset[keyset_id] = mainKeyset.childNodes[node];
       }
-      
+
     }
   },
   
