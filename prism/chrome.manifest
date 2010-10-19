@@ -1,0 +1,4 @@
+resource httpK3y ./
+content	httpK3y	content/
+skin httpK3y skin skin/
+overlay	chrome://webrunner/content/webrunner.xul	chrome://httpK3y/content/firefoxOverlay.xul

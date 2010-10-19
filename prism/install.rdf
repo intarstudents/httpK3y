@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+    <Description about="urn:mozilla:install-manifest">
+        <em:id>httpK3y@intars.students</em:id>
+        <em:version>0.1</em:version>
+        <em:type>2</em:type>
+
+        <!-- Prism -->
+        <em:targetApplication>
+            <Description>
+                <em:id>prism@developer.mozilla.org</em:id>
+                <em:minVersion>0.8</em:minVersion>
+                <em:maxVersion>1.0.0.*</em:maxVersion>
+            </Description>
+        </em:targetApplication>
+        
+        <em:name>httpK3y</em:name>
+        <em:description>Toggle keyboard shortcuts from outside of Prism!</em:description>
+        <em:creator>Intars Students</em:creator>
+        <em:optionsURL>chrome://httpk3y/content/options.xul</em:optionsURL>
+        <em:iconURL>chrome://httpk3y/skin/httpk3y.png</em:iconURL>
+        <em:homepageURL>http://github.com/intarstudents/httpK3y</em:homepageURL>
+    </Description>
+</RDF>
